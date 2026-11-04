@@ -1,0 +1,35 @@
+name: Publish Sign26 test app
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm install
+      - run: |
+          node scripts/prepare.js
+          npx cap add android
+          sed -i 's#<application#<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />\n    <application#' android/app/src/main/AndroidManifest.xml
+          npx cap sync android
+      - working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk Sign26-test.apk
+          gh release delete test --yes --cleanup-tag || true
+          gh release create test Sign26-test.apk --title "Sign26 test" --notes "Test version" --prerelease
