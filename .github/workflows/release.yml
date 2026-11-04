@@ -18,10 +18,12 @@ jobs:
           distribution: temurin
           java-version: 21
       - run: npm install
+      - run: npm install pdfjs-dist@4.10.38 --no-save
       - run: |
           node scripts/prepare.js
           npx cap add android
           sed -i 's#<application#<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />\n    <application#' android/app/src/main/AndroidManifest.xml
+          sed -i 's#android:allowBackup="true"#android:allowBackup="false"#' android/app/src/main/AndroidManifest.xml
           npx cap sync android
       - working-directory: android
         run: |
