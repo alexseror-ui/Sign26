@@ -1,0 +1,1 @@
+{"name":"sign26","version":"1.0.0","private":true,"dependencies":{"@capacitor/android":"7.6.10","@capacitor/core":"7.6.10","@capacitor/filesystem":"7.1.9","@capacitor/share":"7.0.4"},"devDependencies":{"@capacitor/cli":"7.6.10"}}
